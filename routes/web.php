@@ -12,5 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('form');
 });
+
+Route::post('/compress', 'CompressController@compress')->name('compress');
+
+Route::post('/decompress', 'CompressController@decompress')->name('decompress');
