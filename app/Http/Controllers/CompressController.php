@@ -18,7 +18,6 @@ class CompressController extends Controller
             $compressedArr = str_split($deComressed);
             $i = 0;
             $j = 0;
-            $tempArr = [];
             $substringsArr[0] = $compressedArr[0];
             foreach($compressedArr as $letter) {
                 if($i > 0) {
@@ -45,7 +44,7 @@ class CompressController extends Controller
             $response = $this->returnResponse('success', $compressed);
             return response()->json($response);
         } catch (Exception $e) {
-            $response = $this->returnResponse('error', 'Backend Validation went wrong!');
+            $response = $this->returnResponse('error', $e->getMessage());
             return response()->json($response);
         }
 
@@ -53,12 +52,44 @@ class CompressController extends Controller
 
     public function decompress(Request $request) {
         try {
-            $this->validateRequest($request, '/^[a-f1-9]+$/u');
-            $response = $this->returnResponse('success', $request->message);
+            $this->validateRequest($request, '/^[a-f0-9]+$/u');
+
+            //Decompress string algorithm
+            $compressed = $request->message;
+            $deComressed = '';
+            $pattern = '/[a-f][0-9]+/i';
+            $deComressed = preg_replace_callback(
+                $pattern,
+                function ($matches) {
+                    foreach ($matches as $match) {
+                        $firstLetter = substr($match, 0, 1);
+                        $number = (int)str_replace($firstLetter, '', $match);
+                        $newStr = '';
+                        for($i=0; $i < $number; $i++) {
+                            $newStr .= $firstLetter;
+                        }
+                        return $newStr;
+                    }
+                },
+                $compressed);
+
+            $response = $this->returnResponse('success', $deComressed);
             return response()->json($response);
         } catch (Exception $e) {
-            $response = $this->returnResponse('error', 'Backend Validation went wrong!');
+            $response = $this->returnResponse('error', $e->getMessage());
             return response()->json($response);
+        }
+    }
+
+    public function insertNumber($matches) {
+        foreach ($matches as $match) {
+            $firstLetter = substr($match, 0, 1);
+            $number = (int)str_replace($firstLetter, '', $match);
+            $newStr = '';
+            for($i=0; $i < $number; $i++) {
+                $newStr .= $firstLetter;
+            }
+            return $newStr;
         }
     }
 

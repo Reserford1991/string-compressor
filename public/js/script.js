@@ -32,7 +32,7 @@ $(document).ready(function () {
         let passed = checkString(str, patt);
 
 
-        if (!passed && str !== '') {
+        if (!passed && str !== '' && str.length > 2) {
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -45,7 +45,6 @@ $(document).ready(function () {
                 dataType: 'JSON',
                 success: function (data) {
                     if (data.status === 'success') {
-                        $('#compressed-2').val(data.msg);
                         $('#compressed-1').val(data.msg);
                     } else {
                         fadeInOut(data.msg);
@@ -53,6 +52,9 @@ $(document).ready(function () {
 
                 }
             });
+        } else if (str.length === 2) {
+            $('#compressed-2').val(str);
+            $('#compressed-1').val(str);
         } else {
             fadeInOut('Only Letters a-f are allowed!', timeout);
             addRemoveError('#decompressed-1', timeout);
@@ -85,6 +87,8 @@ $(document).ready(function () {
                     }
                 }
             });
+        } else if (str.length === 2) {
+            $('#decompressed-2').val(str);
         } else {
             fadeInOut('Only Letters a-f and numbers 1-9 are allowed!', timeout);
             addRemoveError('#compressed-2', timeout);
