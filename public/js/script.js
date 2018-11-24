@@ -46,6 +46,7 @@ $(document).ready(function () {
                 success: function (data) {
                     if (data.status === 'success') {
                         $('#compressed-1').val(data.msg);
+                        $('#compressed-2').val(data.msg);
                     } else {
                         fadeInOut(data.msg, timeout);
                     }
