@@ -1,55 +1,93 @@
 $(document).ready(function () {
-    console.log("ready!");
 
+    function checkString (str, patt) {
+        let res = str.match(patt);
+        return (res);
+    }
+
+    function fadeInOut (mess, timeout) {
+        $('.error-message-p').html(mess);
+        $('.error-message').fadeIn();
+        setTimeout(function(){
+            $('.error-message').fadeOut();
+            $('error-message-p').html('');
+        }, timeout);
+        return $.Deferred().resolve();
+    }
+
+    function addRemoveError(selector, timeout) {
+        $(selector).parent().addClass('has-error');
+        setTimeout(function(){
+            $(selector).parent().removeClass('has-error');
+        }, timeout);
+    }
+
+    const timeout = 3000;
 
     $('#compress').on('click', function (e) {
         e.preventDefault();
 
-        // $.ajaxSetup({
-        //     headers: {
-        //         'X-CSRF-Token': $('meta[name="_token"]').attr('content')
-        //     }
-        // });
+        let patt = /[^a-f]/g;
+        let str = $('#decompressed-1').val();
+        let passed = checkString(str, patt);
 
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            /* the route pointing to the post function */
-            url: compress,
-            type: 'POST',
-            /* send the csrf-token and the input to the controller */
-            data: {
-                message:'test'
-            },
-            dataType: 'JSON',
-            /* remind that 'data' is the response of the AjaxController */
-            success: function (data) {
-                console.log(data.msg);
-            }
-        });
+
+        if (!passed && str !== '') {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: compress,
+                type: 'POST',
+                data: {
+                    message:str
+                },
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.status === 'success') {
+                        $('#compressed-2').val(data.msg);
+                        $('#compressed-1').val(data.msg);
+                    } else {
+                        fadeInOut(data.msg);
+                    }
+
+                }
+            });
+        } else {
+            fadeInOut('Only Letters a-f are allowed!', timeout);
+            addRemoveError('#decompressed-1', timeout);
+        }
     });
 
     $('#decompress').on('click', function (e) {
         e.preventDefault();
 
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            /* the route pointing to the post function */
-            url: decompress,
-            type: 'POST',
-            /* send the csrf-token and the input to the controller */
-            data: {
-                message:'test'
-            },
-            dataType: 'JSON',
-            /* remind that 'data' is the response of the AjaxController */
-            success: function (data) {
-                console.log(data.msg);
-            }
-        });
+        let patt = /[^a-f0-9]/g;
+        let str = $('#compressed-2').val();
+        let passed = checkString(str, patt);
 
+        if (!passed && str !== '') {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: decompress,
+                type: 'POST',
+                data: {
+                    message:str
+                },
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.status === 'success') {
+                        $('#decompressed-2').val(data.msg);
+                    } else {
+                        fadeInOut(data.msg, timeout);
+                    }
+                }
+            });
+        } else {
+            fadeInOut('Only Letters a-f and numbers 1-9 are allowed!', timeout);
+            addRemoveError('#compressed-2', timeout);
+        }
     });
 });
