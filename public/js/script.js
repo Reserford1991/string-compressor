@@ -47,7 +47,7 @@ $(document).ready(function () {
                     if (data.status === 'success') {
                         $('#compressed-1').val(data.msg);
                     } else {
-                        fadeInOut(data.msg);
+                        fadeInOut(data.msg, timeout);
                     }
 
                 }

@@ -44,7 +44,7 @@ class CompressController extends Controller
             $response = $this->returnResponse('success', $compressed);
             return response()->json($response);
         } catch (Exception $e) {
-            $response = $this->returnResponse('error', $e->getMessage());
+            $response = $this->returnResponse('error', __FILE__. ' ' . __LINE__. ': ' . $e->getMessage());
             return response()->json($response);
         }
 
@@ -76,20 +76,8 @@ class CompressController extends Controller
             $response = $this->returnResponse('success', $deComressed);
             return response()->json($response);
         } catch (Exception $e) {
-            $response = $this->returnResponse('error', $e->getMessage());
+            $response = $this->returnResponse('error', __FILE__. ' ' . __LINE__. ': ' . $e->getMessage());
             return response()->json($response);
-        }
-    }
-
-    public function insertNumber($matches) {
-        foreach ($matches as $match) {
-            $firstLetter = substr($match, 0, 1);
-            $number = (int)str_replace($firstLetter, '', $match);
-            $newStr = '';
-            for($i=0; $i < $number; $i++) {
-                $newStr .= $firstLetter;
-            }
-            return $newStr;
         }
     }
 
